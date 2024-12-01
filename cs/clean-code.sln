@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "Samples\Samples.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown", "Markdown\Markdown.csproj", "{7352C911-096E-432D-A214-D40B1C919664}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markdown_Tests", "Markdown_Tests\Markdown_Tests.csproj", "{091EDA1C-DDC2-45B2-963C-4B68E35F619D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{7352C911-096E-432D-A214-D40B1C919664}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7352C911-096E-432D-A214-D40B1C919664}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7352C911-096E-432D-A214-D40B1C919664}.Release|Any CPU.Build.0 = Release|Any CPU
+		{091EDA1C-DDC2-45B2-963C-4B68E35F619D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{091EDA1C-DDC2-45B2-963C-4B68E35F619D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{091EDA1C-DDC2-45B2-963C-4B68E35F619D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{091EDA1C-DDC2-45B2-963C-4B68E35F619D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
