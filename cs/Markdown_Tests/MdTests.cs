@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Markdown;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Markdown_Tests;
 
@@ -32,17 +31,6 @@ public class MdTests
         htmlString.Should().Be(mdString);
     }
 
-    [TestCase("a\n\nb", "a</br>b")]
-    [TestCase("a\r\n\r\nb", "a</br>b")]
-    [TestCase("a\n\n\n\nb", "a</br>b")]
-    [TestCase("a\r\n\r\n\r\n\r\nb", "a</br>b")]
-    [Description("Перенос строки")]
-    public void Render_ConvertsLineBreaks(string mdString, string expectedHtmlString)
-    {
-        var actualHtmlString = _md.Render(mdString);
-        actualHtmlString.Should().Be(expectedHtmlString);
-    }
-
     [TestCaseSource(nameof(GetTextsWithValidPairTags), new object[] { "_", "em" })]
     [TestCaseSource(nameof(GetTextsWithInvalidPairTags), new object[] { "_", "em" })]
     [Description("Курсив")]
@@ -62,7 +50,7 @@ public class MdTests
     }
 
     [TestCase("# a", "<h1>a</h1>")]
-    [TestCase("a\n# b", "a\n<h1>a</h1>")]
+    [TestCase("a\n# b", "a\n<h1>b</h1>")]
     [TestCase("# a\nb", "<h1>a</h1>\nb", Description = "В заголовок входят символы до конца строки")]
     [TestCase("a # b", "a # b", Description = "Заголовок должен быть в начале строки")]
     [Description("Заголовок")]
@@ -72,12 +60,54 @@ public class MdTests
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
+    [TestCase("<a>", "<a href=\"a\">a</a>")]
+    [TestCase("[a](b)", "<a href=\"b\">a</a>")]
+    [Description("Ссылка")]
+    public void Render_WorksWithLinkTag(string mdString, string expectedHtmlString)
+    {
+        var actualHtmlString = _md.Render(mdString);
+        actualHtmlString.Should().Be(expectedHtmlString);
+    }
+
+    [TestCase("![a](b)", "<img src=\"b\" alt=\"a\">")]
+    [Description("Изображение")]
+    public void Render_WorksWithImageTag(string mdString, string expectedHtmlString)
+    {
+        var actualHtmlString = _md.Render(mdString);
+        actualHtmlString.Should().Be(expectedHtmlString);
+    }
+
+    [TestCase("1. a\n2. b", "<ol><li>a</li>\n<li>b</li></ol>")]
+    [TestCase("12345. a\n99999. b", "<ol><li>a</li>\n<li>b</li></ol>")]
+    [TestCase("1. a\n2. b\nc", "<ol><li>a</li>\n<li>b</li></ol>\nc")]
+    [TestCase("1. a\n2. b\nc\n1. d", "<ol><li>a</li>\n<li>b</li></ol>\nc<ol>\n<li>d</li></ol>")]
+    [Description("Нумерованный список")]
+    public void Render_WorksWithOrderedListTag(string mdString, string expectedHtmlString)
+    {
+        var actualHtmlString = _md.Render(mdString);
+        actualHtmlString.Should().Be(expectedHtmlString);
+    }
+
+    [TestCase("- a\n- b", "<ul><li>a</li>\n<li>b</li></ul>")]
+    [TestCase("- a\n- b\nc", "<ul><li>a</li>\n<li>b</li></ul>\nc")]
+    [TestCase("- a\n- b\nc\n- d", "<ul><li>a</li>\n<li>b</li></ul>\nc<ul>\n<li>d</li></ul>")]
+    [Description("Ненумерованный список")]
+    public void Render_WorksWithUnorderedListTag(string mdString, string expectedHtmlString)
+    {
+        var actualHtmlString = _md.Render(mdString);
+        actualHtmlString.Should().Be(expectedHtmlString);
+    }
+
     [TestCase(@"\a", @"\a")]
     [TestCase(@"\_a_", @"_a_")]
     [TestCase(@"\__a__", @"__a__")]
     [TestCase(@"\# a", @"# a")]
+    [TestCase(@"\<a>", @"<a>")]
+    [TestCase(@"\[a](b)", @"[a](b)")]
+    [TestCase(@"\- a", @"- a")]
     [TestCase(@"\\_a_", @"\<em>a</em>")]
     [TestCase(@"\__a_", @"_<em>a</em>")]
+    [TestCase(@"\![a](b)", @"!<a href=""b"">a</a>")]
     [Description("Экранирование")]
     public void Render_IgnoresEscapedTags(string mdString, string expectedHtmlString)
     {
@@ -105,7 +135,6 @@ public class MdTests
 
     [TestCase("__a _b_ c__", "<strong>a <em>b</em> c</strong>")]
     [TestCase("__a_b_c__", "<strong>a<em>b</em>c</strong>")]
-    [TestCase("___a___", "<strong><em>a</em></strong>")]
     [Description("Курсив внутри жирного текста работает")]
     public void Render_ItalicTextTagsWorkInsideBoldText(string mdString, string expectedHtmlString)
     {
@@ -132,13 +161,40 @@ public class MdTests
         htmlString.Should().Be(mdString);
     }
 
-    [Test]
+    [TestCase("__a _b c__ d_")]
+    [TestCase("___a___")]
     [Description("В случае пересечения областей парных тегов, они не считаются тегами")]
-    public void Render_PairTagsDoNotWork_WhenIntersected()
+    public void Render_PairTagsDoNotWork_WhenIntersected(string mdString)
     {
-        var mdString = "__a _b c__ d_";
         var htmlString = _md.Render(mdString);
         htmlString.Should().Be(mdString);
+    }
+
+    [Test]
+    [Description("Работает за линейное время")]
+    public void Render_PerformanceTest()
+    {
+        var mdString = "__a__ _b_\n# c \\__d__ <e> [f](g) ![h](k)\n1. l\n2. m\n- n\n o";
+        var minRepetitionsCount = 64;
+        var maxRepetitionsCount = 512;
+        var step = 2;
+        var error = 1;
+
+        var benchmark = new Benchmark();
+        var previousTime = 0L;
+
+        for (var count = minRepetitionsCount; count <= maxRepetitionsCount; count *= step)
+        {
+            var arg = string.Concat(Enumerable.Repeat(mdString, count));
+            var time = benchmark.MeasureMilliseconds(() => _md.Render(arg), 100);
+
+            if (previousTime != 0)
+            {
+                time.Should().BeLessThan((step + error) * previousTime);
+            }
+
+            previousTime = time;
+        }
     }
 
     private static IEnumerable<TestCaseData> GetTextsWithValidPairTags(string mdTag, string htmlTag)
@@ -161,8 +217,6 @@ public class MdTests
             .SetDescription("Только закрывающий тег не считается тегом");
         yield return new TestCaseData($"{mdTag}{mdTag}", $"{mdTag}{mdTag}")
             .SetDescription("Если между парными тегами пустая строка, они не считаются тегами");
-        yield return new TestCaseData($"{mdTag}a\n\nb{mdTag}", $"{mdTag}a</br>b{mdTag}")
-            .SetDescription("Если между парными тегами перенос строки, они не считаются тегами");
         yield return new TestCaseData($"{mdTag}a {mdTag}b", $"{mdTag}a {mdTag}b")
             .SetDescription("Закрывающий тег не может иметь пробел перед ним");
         yield return new TestCaseData($"a{mdTag} b{mdTag}", $"a{mdTag} b{mdTag}")
