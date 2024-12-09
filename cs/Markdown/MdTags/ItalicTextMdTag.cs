@@ -2,19 +2,19 @@ using Markdown.MdTags.Interfaces;
 
 namespace Markdown.MdTags;
 
-internal class ItalicTextMdTag : IMdPairTag, IHtmlTagsPair
+internal class ItalicTextMdTag : IMdTag, IHtmlTagsPair
 {
+    private const string MdTag = "_";
+
     public string HtmlOpenTag => "<em>";
 
     public string HtmlCloseTag => "</em>";
 
-    public bool IsMdTag(string mdString, int index, out int tagLength)
-    {
-        throw new NotImplementedException();
-    }
+    public TagType TagType => TagType.Pair;
 
-    public IEnumerable<TagIndicesPair> PairTagIndices(string mdString, IList<int> tagIndices)
+    public bool IsMdTag(string mdString, int startIndex, out int tagLength)
     {
-        throw new NotImplementedException();
+        tagLength = MdTag.Length;
+        return TagSearchHelper.IsSubstring(mdString, MdTag, startIndex);
     }
 }
