@@ -6,7 +6,7 @@ internal class UnorderedListItemMdTag : IGroupedMdTag, IHtmlTagsPair
 {
     private const string MdTag = "-";
 
-    private readonly UnorderedListHtmlTagsPair _unorderedListTags = new();
+    private readonly UnorderedListHtmlTagsPair unorderedListTags = new();
 
     public string HtmlOpenTag => "<li>";
 
@@ -14,7 +14,7 @@ internal class UnorderedListItemMdTag : IGroupedMdTag, IHtmlTagsPair
 
     public TagType TagType => TagType.FullLine;
 
-    public IHtmlTagsPair GroupHtmlTagsPair => _unorderedListTags;
+    public IHtmlTagsPair GroupHtmlTagsPair => unorderedListTags;
 
     public bool IsMdTag(string mdString, int startIndex, out int tagLength)
     {

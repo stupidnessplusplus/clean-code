@@ -5,18 +5,18 @@ namespace Markdown_Tests;
 
 public class MdTests
 {
-    private Md _md;
+    private Md md;
 
     [SetUp]
     public void Setup()
     {
-        _md = new Md();
+        md = new Md();
     }
 
     [Test]
     public void Render_ThrowsException_WhenArgumentIsNull()
     {
-        var render = () => _md.Render(null!);
+        var render = () => md.Render(null!);
         render.Should().Throw<ArgumentNullException>();
     }
 
@@ -27,7 +27,7 @@ public class MdTests
     [Description("Не изменяет строку без тегов")]
     public void Render_ReturnsSameText_WhenWithoutTags(string mdString)
     {
-        var htmlString = _md.Render(mdString);
+        var htmlString = md.Render(mdString);
         htmlString.Should().Be(mdString);
     }
 
@@ -36,7 +36,7 @@ public class MdTests
     [Description("Курсив")]
     public void Render_WorksWithItalicTextTag(string mdString, string expectedHtmlString)
     {
-        var actualHtmlString = _md.Render(mdString);
+        var actualHtmlString = md.Render(mdString);
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
@@ -45,7 +45,7 @@ public class MdTests
     [Description("Жирный текст")]
     public void Render_WorksWithBoldTextTag(string mdString, string expectedHtmlString)
     {
-        var actualHtmlString = _md.Render(mdString);
+        var actualHtmlString = md.Render(mdString);
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
@@ -56,7 +56,7 @@ public class MdTests
     [Description("Заголовок")]
     public void Render_WorksWithHeaderTag(string mdString, string expectedHtmlString)
     {
-        var actualHtmlString = _md.Render(mdString);
+        var actualHtmlString = md.Render(mdString);
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
@@ -65,7 +65,7 @@ public class MdTests
     [Description("Ссылка")]
     public void Render_WorksWithLinkTag(string mdString, string expectedHtmlString)
     {
-        var actualHtmlString = _md.Render(mdString);
+        var actualHtmlString = md.Render(mdString);
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
@@ -73,7 +73,7 @@ public class MdTests
     [Description("Изображение")]
     public void Render_WorksWithImageTag(string mdString, string expectedHtmlString)
     {
-        var actualHtmlString = _md.Render(mdString);
+        var actualHtmlString = md.Render(mdString);
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
@@ -84,7 +84,7 @@ public class MdTests
     [Description("Нумерованный список")]
     public void Render_WorksWithOrderedListTag(string mdString, string expectedHtmlString)
     {
-        var actualHtmlString = _md.Render(mdString);
+        var actualHtmlString = md.Render(mdString);
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
@@ -94,7 +94,7 @@ public class MdTests
     [Description("Ненумерованный список")]
     public void Render_WorksWithUnorderedListTag(string mdString, string expectedHtmlString)
     {
-        var actualHtmlString = _md.Render(mdString);
+        var actualHtmlString = md.Render(mdString);
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
@@ -111,7 +111,7 @@ public class MdTests
     [Description("Экранирование")]
     public void Render_IgnoresEscapedTags(string mdString, string expectedHtmlString)
     {
-        var actualHtmlString = _md.Render(mdString);
+        var actualHtmlString = md.Render(mdString);
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
@@ -120,7 +120,7 @@ public class MdTests
     public void Render_IgnoresInvalidPairTags()
     {
         var mdString = "__a_";
-        var htmlString = _md.Render(mdString);
+        var htmlString = md.Render(mdString);
         htmlString.Should().Be(mdString);
     }
 
@@ -129,7 +129,7 @@ public class MdTests
     [Description("Курсив и жирный текст внутри заголовка работают")]
     public void Render_ItalicAndBoldTextTagsWorkInsideHeader(string mdString, string expectedHtmlString)
     {
-        var actualHtmlString = _md.Render(mdString);
+        var actualHtmlString = md.Render(mdString);
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
@@ -138,7 +138,7 @@ public class MdTests
     [Description("Курсив внутри жирного текста работает")]
     public void Render_ItalicTextTagsWorkInsideBoldText(string mdString, string expectedHtmlString)
     {
-        var actualHtmlString = _md.Render(mdString);
+        var actualHtmlString = md.Render(mdString);
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
@@ -147,7 +147,7 @@ public class MdTests
     [Description("Жирный текст внутри курсива не работает")]
     public void Render_BoldTextTagsDoNotWorkInsideItalicText(string mdString, string expectedHtmlString)
     {
-        var actualHtmlString = _md.Render(mdString);
+        var actualHtmlString = md.Render(mdString);
         actualHtmlString.Should().Be(expectedHtmlString);
     }
 
@@ -157,7 +157,7 @@ public class MdTests
     [Description("Окруженные цифрами подчеркивания не считаются тегами")]
     public void Render_IgnoresUnderscoresSurroundedByNumbers(string mdString)
     {
-        var htmlString = _md.Render(mdString);
+        var htmlString = md.Render(mdString);
         htmlString.Should().Be(mdString);
     }
 
@@ -166,7 +166,7 @@ public class MdTests
     [Description("В случае пересечения областей парных тегов, они не считаются тегами")]
     public void Render_PairTagsDoNotWork_WhenIntersected(string mdString)
     {
-        var htmlString = _md.Render(mdString);
+        var htmlString = md.Render(mdString);
         htmlString.Should().Be(mdString);
     }
 
@@ -186,7 +186,7 @@ public class MdTests
         for (var count = minRepetitionsCount; count <= maxRepetitionsCount; count *= step)
         {
             var arg = string.Concat(Enumerable.Repeat(mdString, count));
-            var time = benchmark.MeasureMilliseconds(() => _md.Render(arg), 100);
+            var time = benchmark.MeasureMilliseconds(() => md.Render(arg), 100);
 
             if (previousTime != 0)
             {

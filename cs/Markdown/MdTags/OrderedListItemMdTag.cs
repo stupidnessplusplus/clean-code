@@ -6,7 +6,7 @@ internal class OrderedListItemMdTag : IGroupedMdTag, IHtmlTagsPair
 {
     private const string MdTagEnd = ".";
 
-    private readonly OrderedListHtmlTagsPair _orderedListTags = new();
+    private readonly OrderedListHtmlTagsPair orderedListTags = new();
 
     public string HtmlOpenTag => "<li>";
 
@@ -14,7 +14,7 @@ internal class OrderedListItemMdTag : IGroupedMdTag, IHtmlTagsPair
 
     public TagType TagType => TagType.FullLine;
 
-    public IHtmlTagsPair GroupHtmlTagsPair => _orderedListTags;
+    public IHtmlTagsPair GroupHtmlTagsPair => orderedListTags;
 
     public bool IsMdTag(string mdString, int startIndex, out int tagLength)
     {

@@ -6,7 +6,7 @@ internal class ImageMdTag : IMdTag, IHtmlConverter
 {
     private const string MdTag = "!";
 
-    private readonly LinkMdTag _linkMdTag = new();
+    private readonly LinkMdTag linkMdTag = new();
 
     public TagType TagType => TagType.Normal;
 
@@ -42,6 +42,6 @@ internal class ImageMdTag : IMdTag, IHtmlConverter
         titleLength = default;
         pathLength = default;
         return TagSearchHelper.IsSubstring(mdString, MdTag, startIndex)
-            && _linkMdTag.IsLinkTagWithTitle(mdString, startIndex + MdTag.Length, out titleLength, out pathLength);
+            && linkMdTag.IsLinkTagWithTitle(mdString, startIndex + MdTag.Length, out titleLength, out pathLength);
     }
 }

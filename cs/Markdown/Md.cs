@@ -7,10 +7,10 @@ namespace Markdown;
 
 public class Md : IStringProcessor
 {
-    private readonly ITagPairsFinder _tagPairsFinder;
-    private readonly IPairTagsIntersectionHandler _pairTagsIntersectionHandler;
-    private readonly IGroupTagInsertionsFinder _groupTagInsertionsFinder;
-    private readonly IMdTag[] _mdTags;
+    private readonly ITagPairsFinder tagPairsFinder;
+    private readonly IPairTagsIntersectionHandler pairTagsIntersectionHandler;
+    private readonly IGroupTagInsertionsFinder groupTagInsertionsFinder;
+    private readonly IMdTag[] mdTags;
 
     public Md() : this(
         new TagPairsFinder(),
@@ -40,9 +40,9 @@ public class Md : IStringProcessor
         ArgumentNullException.ThrowIfNull(pairTagsIntersectionHandler);
         ArgumentNullException.ThrowIfNull(groupTagInsertionsFinder);
 
-        _tagPairsFinder = tagPairsFinder;
-        _pairTagsIntersectionHandler = pairTagsIntersectionHandler;
-        _groupTagInsertionsFinder = groupTagInsertionsFinder;
+        this.tagPairsFinder = tagPairsFinder;
+        this.pairTagsIntersectionHandler = pairTagsIntersectionHandler;
+        this.groupTagInsertionsFinder = groupTagInsertionsFinder;
 
         tags ??= [];
 
@@ -56,14 +56,14 @@ public class Md : IStringProcessor
             }
         }
 
-        _mdTags = tags;
+        mdTags = tags;
     }
 
     public string Render(string mdString)
     {
         ArgumentNullException.ThrowIfNull(mdString);
 
-        var tagsIndices = GetTagsIndices(mdString, _mdTags)
+        var tagsIndices = GetTagsIndices(mdString, mdTags)
             .GroupBy(kv => kv.Key.TagType)
             .ToDictionary(group => group.Key, group => group.ToDictionary());
         var htmlReplacements = new Dictionary<int, SubstringReplacement>();
@@ -158,8 +158,8 @@ public class Md : IStringProcessor
         Dictionary<IMdTag, List<SubstringReplacement>> pairTagsPositions)
     {
         var pairedTags = pairTagsPositions
-            .ToDictionary(kv => kv.Key, kv => _tagPairsFinder.PairTags(mdString, kv.Value).ToList());
-        var tagPairs = _pairTagsIntersectionHandler
+            .ToDictionary(kv => kv.Key, kv => tagPairsFinder.PairTags(mdString, kv.Value).ToList());
+        var tagPairs = pairTagsIntersectionHandler
             .RemoveIntersections(pairedTags)
             .ToDictionary(kv => (IHtmlTagsPair)kv.Key, KeyValuePair => KeyValuePair.Value.AsEnumerable());
 
@@ -171,7 +171,7 @@ public class Md : IStringProcessor
         Dictionary<IMdTag, List<SubstringReplacement>> fullLineTagsPositions)
     {
         var pairedTags = fullLineTagsPositions
-            .ToDictionary(kv => (IHtmlTagsPair)kv.Key, kv => _tagPairsFinder.PairFullLineTags(mdString, kv.Value));
+            .ToDictionary(kv => (IHtmlTagsPair)kv.Key, kv => tagPairsFinder.PairFullLineTags(mdString, kv.Value));
 
         return GetPairedTagsReplacements(mdString, pairedTags);
     }
@@ -185,7 +185,7 @@ public class Md : IStringProcessor
                 .SelectMany(pair => pair.GetHtmlReplacements(kv.Key).Flatten()));
         var groupTagsHtmlInsertions = pairedTags
             .Where(kv => kv.Key is IGroupedMdTag)
-            .SelectMany(kv => _groupTagInsertionsFinder
+            .SelectMany(kv => groupTagInsertionsFinder
                 .GetGroupTagReplacements(mdString, ((IGroupedMdTag)kv.Key).GroupHtmlTagsPair, kv.Value));
 
         return htmlReplacements
