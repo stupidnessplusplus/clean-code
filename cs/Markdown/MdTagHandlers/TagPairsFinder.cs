@@ -60,7 +60,10 @@ internal class TagPairsFinder : ITagPairsFinder
     {
         for (var (i, j) = (0, 0); i < tagPositions.Length; i++)
         {
-            for (; lineBreakIndices[j] < tagPositions[i].EndIndex; j++) ;
+            while (lineBreakIndices[j] < tagPositions[i].EndIndex)
+            {
+                j++;
+            }
 
             yield return new TagReplacementsPair(tagPositions[i], new SubstringReplacement(lineBreakIndices[j], 0));
         }

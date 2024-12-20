@@ -100,7 +100,7 @@ public class Md : IStringProcessor
 
     private Dictionary<IMdTag, List<SubstringReplacement>> GetTagsIndices(string mdString, IEnumerable<IMdTag> tags)
     {
-        var tagsIndices = tags.ToDictionary(tag => tag, tag => new List<SubstringReplacement>());
+        var tagsIndices = tags.ToDictionary(tag => tag, _ => new List<SubstringReplacement>());
 
         for (var i = 0; i < mdString.Length; i++)
         {
@@ -161,7 +161,7 @@ public class Md : IStringProcessor
             .ToDictionary(kv => kv.Key, kv => tagPairsFinder.PairTags(mdString, kv.Value).ToList());
         var tagPairs = pairTagsIntersectionHandler
             .RemoveIntersections(pairedTags)
-            .ToDictionary(kv => (IHtmlTagsPair)kv.Key, KeyValuePair => KeyValuePair.Value.AsEnumerable());
+            .ToDictionary(kv => (IHtmlTagsPair)kv.Key, kv => kv.Value.AsEnumerable());
 
         return GetPairedTagsReplacements(mdString, tagPairs);
     }

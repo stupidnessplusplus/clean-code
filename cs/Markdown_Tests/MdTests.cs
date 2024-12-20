@@ -5,7 +5,7 @@ namespace Markdown_Tests;
 
 public class MdTests
 {
-    private Md md;
+    private IStringProcessor md;
 
     [SetUp]
     public void Setup()

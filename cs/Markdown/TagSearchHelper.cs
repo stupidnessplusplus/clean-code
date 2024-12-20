@@ -43,7 +43,12 @@ internal static class TagSearchHelper
 
     public static bool IsNumber(string str, int startIndex, out int length)
     {
-        for (length = 0; startIndex + length < str.Length && char.IsDigit(str[startIndex + length]); length++) ;
+        length = 0;
+
+        while (startIndex + length < str.Length && char.IsDigit(str[startIndex + length]))
+        {
+            length++;
+        }
 
         return length != 0;
     }

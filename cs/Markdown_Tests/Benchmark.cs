@@ -5,19 +5,19 @@ namespace Markdown_Tests;
 internal class Benchmark
 {
     public long MeasureMilliseconds(
-        Action f,
+        Action measuringAction,
         int repetitionsCount)
     {
         GC.Collect();
         GC.WaitForPendingFinalizers();
-        f.Invoke();
+        measuringAction.Invoke();
 
         var stopWatch = new Stopwatch();
         stopWatch.Start();
 
         for (var i = 0; i < repetitionsCount; i++)
         {
-            f.Invoke();
+            measuringAction.Invoke();
         }
 
         stopWatch.Stop();

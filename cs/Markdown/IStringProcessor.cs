@@ -1,6 +1,6 @@
 namespace Markdown;
 
-internal interface IStringProcessor
+public interface IStringProcessor
 {
     public string Render(string str);
 }
